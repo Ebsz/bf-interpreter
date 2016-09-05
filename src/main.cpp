@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#include "interpreter.h"
+#include "../include/interpreter.h"
 // TODO:
 // 			* Make a struct to contain cells
 

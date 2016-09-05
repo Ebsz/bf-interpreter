@@ -1,5 +1,5 @@
 #include <iostream>
-#include "interpreter.h"
+#include "../include/interpreter.h"
 
 
 Interpreter::Interpreter() :  currentInputIndex(0), input()

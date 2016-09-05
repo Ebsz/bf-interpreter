@@ -1,7 +1,7 @@
 CXX=g++
 CXXFLAGS=-std=c++11
 
-SOURCES=main.cpp interpreter.cpp
+SOURCES=src/*.cpp
 
 BIN=bfint
 
