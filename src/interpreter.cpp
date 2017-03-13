@@ -1,67 +1,64 @@
 #include <iostream>
 #include "../include/interpreter.h"
 
-
-Interpreter::Interpreter() :  currentInputIndex(0), input()
+Interpreter::Interpreter() :  currentInputIndex(0), currentCell(0), bracketCount(1), input()
 {
-}
-
-void Interpreter::reset()
-{
-	for(int i = 0; i< 30000;i++)
-	{
-		cells[i] = 0;
-	}
-	currentCell=0;
-	currentInputIndex=0;
 }
 
 void Interpreter::interpret(std::string in)
-{	
-	reset();
-	input = in;
+{
 	int inputLength = in.length();
+	currentInputIndex=0;
+	currentCell=0;
+	input = in;
 
+	// Will run until EOF
 	while(currentInputIndex < inputLength)
 	{
 		switch(input[currentInputIndex])
 		{
 			case '+':
 				incrementCell();
+				currentInputIndex++;
 				break;
 
 			case '-':
 				decrementCell();
+				currentInputIndex++;
 				break;
 
 			case '>':
 				movePtrNext();
+				currentInputIndex++;
 				break;
 
 			case '<':
 				movePtrPrev();
+				currentInputIndex++;
 				break;
 
 			case '.':
 				printCurrentCell();
+				currentInputIndex++;
 				break;
 
 			case ',':
 				getInputCurrentCell();
+				currentInputIndex++;
 				break;
-		
+
 			case '[':
-				leftLoop();
+				loopStart();
 				break;
-			
+
 			case ']':
-				rightLoop();
+				loopEnd();
 				break;
 
 			default:
+				currentInputIndex++;
 				break;
 		}
-		currentInputIndex++;
 	}
 }
 
@@ -71,13 +68,10 @@ void Interpreter::incrementCell()
 	cells[currentCell]++;
 }
 
-// '-' command 
+// '-' command
 void Interpreter::decrementCell()
 {
-	if(cells[currentCell] >0)
-	{
-		cells[currentCell]--;
-	}
+	cells[currentCell]--;
 }
 
 // '>' command
@@ -89,10 +83,7 @@ void Interpreter::movePtrNext()
 // '<' command
 void Interpreter::movePtrPrev()
 {
-	if(currentCell > 0)
-	{
-		currentCell--;
-	}
+	currentCell--;
 }
 
 // '.'command
@@ -106,33 +97,53 @@ void Interpreter::getInputCurrentCell()
 {
 	char in;
 	in = std::cin.get();
-	cells[currentCell] = int(in);
+	cells[currentCell] = (int)in;
 	std::cin.ignore();
 }
 
 // '[' command
-//	Jumps to corresponding bracket if value of current cell is 0, otherwise enters the loop
-void Interpreter::leftLoop()
+//	Jumps after corresponding bracket if value of current cell is 0, otherwise enters the loop
+void Interpreter::loopStart()
 {
+	bracketCount = 1;
+
 	if(cells[currentCell] == 0)
 	{
-		while ( input[currentInputIndex] != ']')
-		{
+		do {
 			currentInputIndex++;
-		}
+
+			if(input[currentInputIndex] == '[') {
+				bracketCount++;
+			}
+			else if(input[currentInputIndex] == ']')
+			{
+				bracketCount--;
+			}
+
+		} while (input[currentInputIndex] != ']' || bracketCount > 0);
 	}
+		currentInputIndex++;
 }
 
 // ']' command
 // Moves back to corresponding bracket if value of current cell isnt 0,
 // otherwise exits the loop
-void Interpreter::rightLoop()
+void Interpreter::loopEnd()
 {
+	bracketCount = 1;
+
 	if(cells[currentCell] != 0)
 	{
-		while(input[currentInputIndex] != '[')
-		{
-			currentInputIndex--;	
-		}
+		do {
+			currentInputIndex--;
+
+			if(input[currentInputIndex] == ']') {
+				bracketCount++;
+			} else if(input[currentInputIndex] == '[') {
+				bracketCount--;
+			}
+
+		} while(input[currentInputIndex] != '[' || bracketCount > 0);
 	}
+		currentInputIndex++;
 }
